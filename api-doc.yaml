@@ -1,0 +1,228 @@
+swagger: "2.0"
+info:
+  description: "Documentação da API para o projeto Stop da Cidadania. Todas as rotas são especificadas com o método HTTP, descrição, parametros (body), com exemplos de json, e respostas que a rota pode retornar."
+  version: "0.3.0"
+  title: "Stop Cidadania"
+externalDocs:
+  description: "Repositório da API"
+  url: "http://www.tools.ages.pucrs.br/StopCidadania/api"
+host: "localhost:3000"
+basePath: "/"
+tags:
+- name: "game"
+  description: ""
+paths:
+  /game/create:
+    post:
+      tags:
+      - "game"
+      summary: "Cria um jogo"
+      description: "- Cria um jogo com as informações de número máximo de jogadores, número máximo de categorias e se o jogo é por tempo.\n - Cria um jogador (anfitrião) com base no nickname e email informados. \n - Como resposta, retorna a letra e quais categorias (e suas alternativas) serão utilizadas nesse jogo."
+      operationId: "create"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: ""
+        required: true
+        schema:
+          $ref: "#/definitions/CreateGame"
+      responses:
+        400:
+          description: "Could not create user (hint: check for body requirements)\n"
+        201:
+          description: "Retorna um json com todos os dados do jogo"
+
+  /game/signin:
+    post:
+      tags:
+      - "game"
+      summary: "Entra em um jogo"
+      description: "Entra em um jogo de acordo com o gameId e cria um jogador com o nickname e email informados."
+      operationId: "signin"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: ""
+        required: true
+        schema:
+          $ref: "#/definitions/SigninGame"
+      responses:
+        400:
+          description: "- Could not create user \n- Mensagem de outro erro (err.message)"
+        200:
+          description: "Retorna um json com todos os dados do jogo"
+
+  /game/users:
+    post:
+      tags:
+      - "game"
+      summary: "Retorna todos os usuários de um jogo"
+      description: "Dado um gameId válido (existe um jogo no banco de dados com esse id), retorna todas as informações dos usuários neste jogo."
+      operationId: "users"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: ""
+        required: true
+        schema:
+          $ref: "#/definitions/StatusGame"
+      responses:
+        400:
+          description: "- Could not find the specified value\n- Could not add user in game"
+        200:
+          $ref: "#/definitions/UsersResponse"
+
+  /game/answer:
+    post:
+      tags:
+      - "game"
+      summary: "Salva a resposta de um jogador"
+      description: "De acordo com o userId, a alternativa enviada é adicionada ao banco de dados."
+      operationId: "answer"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: ""
+        required: true
+        schema:
+          $ref: "#/definitions/AnswerGame"
+      responses:
+        200:
+          decription: ""
+
+  /game/status:
+    post:
+      tags:
+      - "game"
+      summary: "Altera o status do jogo"
+      description: "Os status de um jogo são: \n - OPEN \n - IN_PROGRESS \n - FINISHED \n\n O status é alterado de acorodo com o status atual do jogo."
+      operationId: "status"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: ""
+        required: true
+        schema:
+          $ref: "#/definitions/StatusGame"
+      responses:
+        200:
+          description: ""
+        400:
+          description: "- Could not change game status\n-"
+
+  /game/score/{gameId}:
+    get:
+      tags:
+      - "game"
+      summary: "Rertorna pontuação de todos os jogadores"
+      description: "Dado um gameId válido (existente), retorna uma lista com o apelido e a pontuação de cada jogador naqule jogo. "
+      operationId: "score"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: path
+        name: gameId
+        required: true
+        description: "Id do jogo para receber as pontuações dos jogadores"
+      responses:
+        200:
+          description: ""
+        400:
+          description: "Could not get the user score"
+
+definitions:
+  CreateGame:
+    type: "object"
+    properties:
+      maxNumberCategories:
+        type: "string"
+        example: "5"
+      maxNumberPlayers:
+        type: "string"
+        example: "5"
+      time:
+        type: "boolean"
+        example: "true"
+      nickname:
+        type: "string"
+        example: "jogadorX"
+      email:
+        type: "string"
+        example: "fulano@pucrs.br"
+
+  SigninGame:
+    type: "object"
+    properties:
+      gameId:
+        type: "string"
+        example: "{{game id válido}}"
+      nickname:
+        type: "string"
+        example: "jogadorY"
+      email:
+        type: "string"
+        example: "fulanoy@pucrs.br"
+
+  AnswerGame:
+    type: "object"
+    properties:
+      userId:
+        type: "string"
+        example: "{{userId}}"
+      alternativeId:
+        type: "string"
+        example: "{{alternativeId}}"
+
+  StatusGame:
+    type: "object"
+    properties:
+      gameId:
+        type: "string"
+        example: "{{gameId}}"
+
+  UsersResponse:
+    type: "object"
+    properties:
+      success:
+        type: "boolean"
+        example: true
+      players:
+        type: "list"
+        example: []
+      status:
+        type: "string"
+        example: "OPEN"
+
+  CreateResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+        example: 2
+      type:
+        type: "string"
+      message:
+        type: "string"

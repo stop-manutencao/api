@@ -1,0 +1,35 @@
+# How to run:
+
+version: '2'
+services:
+  stopdb:
+    container_name: stopdb
+    image: mongo
+    ports:
+      - "27070:27017"
+    volumes:
+      - /vol/ages-stop/db:/data/db/stopdb
+    networks:
+      - stop-network
+
+  stopapi:
+    container_name: stopapi
+    build:
+      context: .
+      dockerfile: Dockerfile_api
+    image: stop-api:latest
+    depends_on:
+      - "stopdb"
+    expose:
+      - "5100"
+    ports:
+      - "5100:3000"
+    environment:
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://stopdb:27017
+    command: ["npm","start", ]
+    networks:
+      - stop-network
+
+networks:
+  stop-network:

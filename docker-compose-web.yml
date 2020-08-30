@@ -1,0 +1,20 @@
+# How to run:
+
+version: '2'
+services:
+  stopweb:
+    container_name: stopweb
+    build:
+      context: .
+      dockerfile: Dockerfile_web
+    image: stop-web:latest
+    ports:
+      - "5500:80"
+      - "443:443"
+    environment:
+     - API_SERVER=www.hml.pucrs.br  # only to AGES environment, need change to your local env.
+     - API_PORT=5100                # only to AGES environment, need change to your local env.
+    networks:
+      - stop-network
+networks:
+    stop-network:
