@@ -149,7 +149,7 @@ async function signIn(req, res) {
     .catch(err => res.status(400)
       .send({
         success: false,
-        message: err.message,
+        message: 'Game does not exist',
         hint:'Invalid body values, check for requirements related to game'
       })
     )
