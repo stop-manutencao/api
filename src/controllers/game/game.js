@@ -35,6 +35,26 @@ async function create(req, res) {
       })
   }
 
+  try {
+    if ( parseInt(req.body.maxNumberPlayers) <= 0) {
+      res.status(400)
+      .send({
+        success: false,
+        message: 'Invalid number of players',
+        hint: 'Check for body requirements related to the game',
+        error: err
+      })
+    }
+  } catch (err) {
+    res.status(400)
+      .send({
+        success: false,
+        message: 'Invalid number of players',
+        hint: 'Check for body requirements related to the game',
+        error: err
+      })
+  }
+
   const user = await userController.createUser(req.body, 'Owner')
 
   if (!user) {
