@@ -69,6 +69,7 @@ keystone.start({
     const io = require('socket.io')(server)
 
     io.on('connection', socket => {
+
       socket.on('getGame', async function(data) {
         socket.join(data.gameId)
         let users = await userController.getUsersSocket(data.gameId)
@@ -87,12 +88,21 @@ keystone.start({
             gameId: data.gameId,
             status: data.status
           }
-          socket.in(data.gameId).emit('gameChanged',retorno)
-          socket.emit('gameChanged',retorno)
+          socket.in(data.gameId).emit('gameChanged', retorno)
+          socket.emit('gameChanged', retorno)
+        }
+      })
+
+      socket.on('exit', async function(data) {
+        await userController.removeInGame(data.playerId)
+        let users = await userController.getUsersSocket(data.gameId)
+        if (data.isOwner) {
+          socket.in(data.gameId).emit('ownerExit')
+        } else {
+          socket.in(data.gameId).emit('users', users)
         }
       })
     })
-
   }
 })
 

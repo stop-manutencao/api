@@ -66,7 +66,7 @@ async function getUsersSocket(gameId) {
   if (!gameId) {
     return false
   }
-  
+
   let players = []
   let game
 
@@ -135,7 +135,6 @@ function createUser(data, userType) {
   return newUser.save()
 }
 
-
 /**
  * Relate a user with a game through both ids (waits for the game creation)
  */
@@ -149,6 +148,15 @@ async function addUserInGame(userId, gameId) {
   return user.save()
 }
 
+
+async function removeInGame(userId) {
+  const User = keystone.list('User').model
+
+  const user = await User.findById(userId)
+  user.game = null
+
+  return user.save()
+}
 
 /**
  * Check when an update or insert is needed
@@ -219,5 +227,6 @@ export default {
   addUserInGame,
   getUsers,
   answerAlternative,
-  getUsersSocket
+  getUsersSocket,
+  removeInGame
 }
