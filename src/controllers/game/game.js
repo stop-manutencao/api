@@ -115,6 +115,7 @@ async function signIn(req, res) {
     .then(async game => {
 
       const User = keystone.list('User').model
+
       let players = await User
         .find({ game: game._id })
 
@@ -125,6 +126,23 @@ async function signIn(req, res) {
           message: 'The room is full',
           hint:'The room is full'
         })
+      }
+
+      for(var i = 0; i < players.length; i++) {
+        if (players[i].nickname == req.body.nickname) {
+          return res.status(400).send({
+            success: false,
+            message: 'Could not create user, nickname `' + req.body.nickname + '` already exists in game',
+            hint: 'Invalid body values, check for requirements related to user'
+          })
+        }
+        if (players[i].email == req.body.email) {
+          return res.status(400).send({
+            success: false,
+            message: 'Could not create user, email `' + req.body.email + '` already exists in game',
+            hint: 'Invalid body values, check for requirements related to user'
+          })
+        }
       }
 
       let user = await userController.createUser(req.body, 'Player')
