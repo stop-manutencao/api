@@ -19,51 +19,48 @@ import { exec } from 'child_process';
 
 async function create(req, res) {
 
-  let maxNumberCategories = req.body.maxNumberCategories
-
   try {
-    if ( parseInt(maxNumberCategories) < 4) {
-      maxNumberCategories = 4
+    if ( parseInt(req.body.maxNumberCategories) < 4) {
+      res.status(400).send({
+        success: false,
+        message: 'Invalid number of categories, must be at least 4',
+        hint: 'Check for body requirements related to the game'
+      })
     }
   } catch (err) {
-    res.status(400)
-      .send({
-        success: false,
-        message: 'Invalid number of categories',
-        hint: 'Check for body requirements related to the game',
-        error: err
-      })
+    res.status(400).send({
+      success: false,
+      message: 'Could not parse maxNumberCategories to integer',
+      hint: 'Check for body requirements related to the game',
+      error: err
+    })
   }
 
   try {
     if ( parseInt(req.body.maxNumberPlayers) <= 0) {
-      res.status(400)
-      .send({
+      res.status(400).send({
         success: false,
-        message: 'Invalid number of players',
-        hint: 'Check for body requirements related to the game',
-        error: err
+        message: 'Invalid number of players, must be greater than 0',
+        hint: 'Check for body requirements related to the game'
       })
     }
   } catch (err) {
-    res.status(400)
-      .send({
-        success: false,
-        message: 'Invalid number of players',
-        hint: 'Check for body requirements related to the game',
-        error: err
-      })
+    res.status(400).send({
+      success: false,
+      message: 'Could not parse maxNumberPlayers to integer',
+      hint: 'Check for body requirements related to the game',
+      error: err
+    })
   }
 
   const user = await userController.createUser(req.body, 'Owner')
 
   if (!user) {
-    return res.status(400)
-      .send({
-        success: false,
-        message: 'Could not create user',
-        hint: 'Invalid body, check for requirements'
-      })
+    return res.status(400).send({
+      success: false,
+      message: 'Could not create empty user',
+      hint: 'Invalid body, check for requirements'
+    })
   }
 
   const Game = keystone.list('Game').model
