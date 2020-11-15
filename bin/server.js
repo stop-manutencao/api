@@ -99,7 +99,7 @@ keystone.start({
         if (data.isOwner) {
           socket.in(data.gameId).emit('ownerExit')
         } else {
-          socket.in(data.gameId).emit('users', users)
+          socket.in(data.gameId).emit('playerLeft', users)
         }
       })
     })
